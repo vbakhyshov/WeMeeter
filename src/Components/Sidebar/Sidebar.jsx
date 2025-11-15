@@ -5,6 +5,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import SearchIcon from '@mui/icons-material/Search';
+import {mainu} from "./SidebarConfig";
 
 const posts = [
     { id: 1, title: "New Spider-Man movie", desc: "i wanna watch new spider-man movie in Ulm cinema but not single.", dist: "2 km", avatar: "🦸‍♂️" },
@@ -24,7 +25,13 @@ const Sidebar = () => {
     return (
         <div className="h-screen fixed left-0 top-0 bg-[#BA4631] text-white flex flex-col shadow-2xl z-50 w-1/4">
 
-            {/* Menu Bar */}
+            {/*{mainu.map((item)=> <div className="flex justify-between items-center px-7 py-3 cursor-pointer text-lg">*/}
+            {/*    {item.icon}*/}
+
+            {/*</div>)}*/}
+
+
+            {/*/!* Menu Bar *!/*/}
             <div className="flex justify-between items-center px-7 py-3">
                 <IconButton sx={{ color: 'white' }}><AccountCircleIcon fontSize="medium" /></IconButton>
                 <IconButton sx={{ color: 'white' }}><ChatBubbleOutlineIcon fontSize="medium" /></IconButton>
