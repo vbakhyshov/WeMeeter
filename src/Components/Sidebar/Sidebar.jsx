@@ -5,7 +5,6 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import SearchIcon from '@mui/icons-material/Search';
-import {mainu} from "./SidebarConfig";
 
 const posts = [
     { id: 1, title: "New Spider-Man movie", desc: "i wanna watch new spider-man movie in Ulm cinema but not single.", dist: "2 km", avatar: "🦸‍♂️" },
@@ -30,13 +29,24 @@ const Sidebar = () => {
 
             {/*</div>)}*/}
 
-
             {/*/!* Menu Bar *!/*/}
-            <div className="flex justify-between items-center px-7 py-3">
-                <IconButton sx={{ color: 'white' }}><AccountCircleIcon fontSize="medium" /></IconButton>
-                <IconButton sx={{ color: 'white' }}><ChatBubbleOutlineIcon fontSize="medium" /></IconButton>
-                <IconButton sx={{ color: 'white' }}><NotificationsNoneIcon fontSize="medium" /></IconButton>
-                <IconButton sx={{ color: 'white' }}><AddCircleOutlineRoundedIcon fontSize="medium" /></IconButton>
+            <div className="flex justify-between items-center px-7 py-3" >
+
+                <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
+                    <AccountCircleIcon fontSize="medium"/>
+                </IconButton>
+
+                <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
+                    <ChatBubbleOutlineIcon fontSize="medium" />
+                </IconButton>
+
+                <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
+                    <NotificationsNoneIcon fontSize="medium" />
+                </IconButton>
+
+                <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
+                    <AddCircleOutlineRoundedIcon fontSize="medium" />
+                </IconButton>
             </div>
 
             {/* Search Field */}
