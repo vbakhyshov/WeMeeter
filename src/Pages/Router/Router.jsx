@@ -7,14 +7,12 @@ const Router = () => {
     return (
         <div>
             <div>
-                <div className='flex'>
-                    <Sidebar />
-                </div>
-                <div>
-                    <Routes>
-                        <Route path='/' element={<HomePage />}></Route>
-                    </Routes>
-                </div>
+                <Sidebar />
+            </div>
+            <div className="ml-[25%]">
+                <Routes>
+                    <Route path='/' element={<HomePage />}></Route>
+                </Routes>
             </div>
         </div>
     )
