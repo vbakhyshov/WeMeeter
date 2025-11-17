@@ -5,6 +5,8 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import SearchIcon from '@mui/icons-material/Search';
+import wemeeter_logo from '../../Pictures/wemeeter_logo.png'
+import { Link } from 'react-router-dom'
 
 const posts = [
     { id: 1, title: "New Spider-Man movie", desc: "i wanna watch new spider-man movie in Ulm cinema but not single.", dist: "2 km", avatar: "🦸‍♂️" },
@@ -22,19 +24,30 @@ const posts = [
 
 const Sidebar = () => {
     return (
-        <div className="h-screen fixed left-0 top-0 bg-[#BA4631] text-white flex flex-col shadow-2xl z-50 w-1/4">
+        <div className="h-screen fixed left-0 top-0 bg-[#BA4631] text-white flex flex-col shadow-2xl z-50 w-[30%]">
 
             {/*{mainu.map((item)=> <div className="flex justify-between items-center px-7 py-3 cursor-pointer text-lg">*/}
             {/*    {item.icon}*/}
 
             {/*</div>)}*/}
 
-            {/*/!* Menu Bar *!/*/}
-            <div className="flex justify-between items-center px-7 py-3" >
+            <div className="flex flex-col items-center py-4 pb-4"> {/* py-4 добавит немного 'воздуха' сверху и снизу */}
+                <Link to="/">
+                    <img
+                        className="h-14"
+                        src={wemeeter_logo}
+                        alt="weMeeter"
+                    />
+                </Link>
+            </div>
 
-                <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
-                    <AccountCircleIcon fontSize="medium"/>
-                </IconButton>
+            {/*/!* Menu Bar *!/*/}
+            <div className="flex justify-between items-center px-7 pb-4" >
+                <Link to="/me">
+                    <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
+                        <AccountCircleIcon fontSize="medium"/>
+                    </IconButton>
+                </Link>
 
                 <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
                     <ChatBubbleOutlineIcon fontSize="medium" />
