@@ -16,6 +16,6 @@
 }
 
 .custom-scrollbar {
-    scrollbar-width: thin;
+    scrollbar-width: none;
     scrollbar-color: #c5c5c5 #BA4631;
 }

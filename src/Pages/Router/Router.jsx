@@ -7,10 +7,10 @@ import Profile from "../Profile/Profile";
 const Router = () => {
     return (
         <div>
-            <div>
+            <div className="fixed top-0 left-0 h-screen w-[25%]">
                 <Sidebar />
             </div>
-            <div className="ml-[30%]">
+            <div className="ml-[25%]">
                 <Routes>
                     <Route path='/' element={<HomePage />}></Route>
                     <Route path='/me' element={<Profile />}></Route>

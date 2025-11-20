@@ -4,7 +4,7 @@ import ProfileUserDetails from "../../Components/ProfileComponents/ProfileUserDe
 const Profile = () => {
     return (
         <div>
-            <div className="relative">
+            <div className="h-screen">
                 <ProfileUserDetails />
             </div>
         </div>

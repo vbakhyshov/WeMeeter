@@ -5,7 +5,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import SearchIcon from '@mui/icons-material/Search';
-import wemeeter_logo from '../../Pictures/wemeeter_logo.png'
+import wemeeter_logo from '../../Pictures/Instagram_logo.png'
 import { Link } from 'react-router-dom'
 
 const posts = [
@@ -24,7 +24,7 @@ const posts = [
 
 const Sidebar = () => {
     return (
-        <div className="h-screen fixed left-0 top-0 bg-[#BA4631] text-white flex flex-col shadow-2xl z-50 w-[30%]">
+        <div className="h-screen bg-[#BA4631] text-white flex flex-col">
 
             {/*{mainu.map((item)=> <div className="flex justify-between items-center px-7 py-3 cursor-pointer text-lg">*/}
             {/*    {item.icon}*/}
@@ -33,11 +33,14 @@ const Sidebar = () => {
 
             <div className="flex flex-col items-center py-4 pb-4"> {/* py-4 добавит немного 'воздуха' сверху и снизу */}
                 <Link to="/">
-                    <img
-                        className="h-14"
-                        src={wemeeter_logo}
-                        alt="weMeeter"
-                    />
+                    {/*<img*/}
+                    {/*    className="h-14"*/}
+                    {/*    src={wemeeter_logo}*/}
+                    {/*    alt="weMeeter"*/}
+                    {/*/>*/}
+                    <p>
+                        weMeeter
+                    </p>
                 </Link>
             </div>
 
@@ -49,17 +52,23 @@ const Sidebar = () => {
                     </IconButton>
                 </Link>
 
-                <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
-                    <ChatBubbleOutlineIcon fontSize="medium" />
-                </IconButton>
+                <Link to="/messages">
+                    <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
+                        <ChatBubbleOutlineIcon fontSize="medium" />
+                    </IconButton>
+                </Link>
 
-                <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
-                    <NotificationsNoneIcon fontSize="medium" />
-                </IconButton>
+                <Link to="/notifications">
+                    <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
+                        <NotificationsNoneIcon fontSize="medium" />
+                    </IconButton>
+                </Link>
 
-                <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
-                    <AddCircleOutlineRoundedIcon fontSize="medium" />
-                </IconButton>
+                <Link to="/newpost">
+                    <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'transparent' } }}>
+                        <AddCircleOutlineRoundedIcon fontSize="medium" />
+                    </IconButton>
+                </Link>
             </div>
 
             {/* Search Field */}
