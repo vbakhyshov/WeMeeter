@@ -4,7 +4,8 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
-import SearchIcon from '@mui/icons-material/Search';
+import SyncIcon from '@mui/icons-material/Sync';
+import UpdateIcon from '@mui/icons-material/Update';
 import wemeeter_logo from '../../Pictures/Instagram_logo.png'
 import { Link } from 'react-router-dom'
 
@@ -80,7 +81,7 @@ const Sidebar = () => {
                         className="w-full py-3 pl-5 pr-10 rounded-full text-gray-700 text-sm focus:outline-none bg-pink-50/90"
                     />
                     <div className="absolute right-3 top-2.5 text-gray-500">
-                        <SearchIcon />
+                        <SyncIcon />
                     </div>
                 </div>
             </div>
