@@ -1,22 +1,13 @@
 import * as React from 'react';
-import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
-import Collapse from '@mui/material/Collapse';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
-import SendIcon from '@mui/icons-material/Send';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import StarBorder from '@mui/icons-material/StarBorder';
-import {getSpaceUntilMaxLength} from "@testing-library/user-event/dist/utils";
 
 const mDialog = [
     { friendNickname: "vlad_ys_lav", friendAvatar: "https://cdn.pixabay.com/photo/2022/02/17/20/37/dog-7019418_1280.jpg" },
-    { friendNickname: "egeegeege", friendAvatar: "https://cdn.pixabay.com/photo/2025/08/09/17/47/modelling-9764984_1280.jpg" },
+    { friendNickname: "ege_azgul", friendAvatar: "https://cdn.pixabay.com/photo/2025/08/09/17/47/modelling-9764984_1280.jpg" },
     { friendNickname: "gavebygod", friendAvatar: "https://cdn.pixabay.com/photo/2025/01/22/11/33/cute-9351912_1280.jpg"},
     { friendNickname: "dianakhaski", friendAvatar: "https://cdn.pixabay.com/photo/2025/10/23/17/29/autumn-9912491_1280.jpg"},
     { friendNickname: "directed_by_daria", friendAvatar: "https://cdn.pixabay.com/photo/2025/09/22/17/45/vietnam-9849104_1280.jpg"},
@@ -46,9 +37,18 @@ const ChatList = ({onSelectChat}) => {
             component="nav"
             aria-labelledby="nested-list-subheader"
         >
-            <ListSubheader component="div" id="nested-list-subheader" sx={{ bgcolor: 'background.paper', zIndex: 1 }}>
-                Messages
-            </ListSubheader>
+            <div className="flex justify-center items-center pt-3 mb-6">
+                <div className="relative">
+                    <input
+                        type="text"
+                        placeholder="find a dialog"
+                        className="w-full py-3 pl-5 pr-10 rounded-full text-gray-700 text-sm focus:outline-none bg-pink-50/90"
+                    />
+                    <div className="absolute right-3 top-2.5 text-gray-500">
+
+                    </div>
+                </div>
+            </div>
 
             <div style={{ flexGrow: 1 }}></div>
 

@@ -5,14 +5,14 @@ import IconButton from '@mui/material/IconButton';
 
 const DUMMY_DATABASE = {
     "vlad_ys_lav": [
-        { id: 1, text: "Hi, daun!", sender: "them" },
-        { id: 2, text: "Hi, gandon.", sender: "me" },
+        { id: 1, text: "Hi, gandon!", sender: "them" },
+        { id: 2, text: "Hi, dovboyob.", sender: "me" },
         { id: 3, text: "let's play tennis at 8 pm", sender: "me" },
         { id: 4, text: "yeeeeeees", sender: "them" },
         { id: 5, text: "blablabla", sender: "them" },
         { id: 6, text: "whatever", sender: "them" },
     ],
-    "egeegeege": [
+    "ege_azgul": [
         { id: 1, text: "where r u bro?", sender: "them" },
         { id: 2, text: "i'm in lidl", sender: "me" },
         { id: 3, text: "where am i bro?", sender: "them" }
@@ -20,6 +20,18 @@ const DUMMY_DATABASE = {
     "gavebygod": [
         { id: 1, text: "aaaaaaaaaaaaaaaa???????", sender: "them" }
     ],
+    "dianakhaski": [
+        { id: 1, text: "mat'", sender: "them" }
+    ],
+    "directed_by_daria": [
+        { id: 1, text: "i'll call u in 5 seconds", sender: "me" }
+    ],
+    "savelka": [
+        { id: 1, text: "brbsbsb", sender: "them" }
+    ],
+    "mr_gamarjoba": [
+        { id: 1, text: "awjfajfajfjf", sender: "me" }
+    ]
 };
 
 const ChatWindow = ({selectedChat}) => {
