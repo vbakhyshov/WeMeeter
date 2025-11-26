@@ -8,7 +8,7 @@ const MessagesPage = () => {
     return (
         <div className="flex h-screen w-full overflow-hidden">
 
-            <div className="w-1/3 min-w-[300px] border-r">
+            <div className="w-1/5 min-w-[300px] border-r">
                 <ChatList onSelectChat={setCurrentChat} />
             </div>
 

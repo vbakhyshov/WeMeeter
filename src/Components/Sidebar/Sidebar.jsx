@@ -8,6 +8,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SyncIcon from '@mui/icons-material/Sync';
 import HomeIcon from '@mui/icons-material/Home';
 import { Link } from 'react-router-dom';
+import wemeeter_logo from '../../Pictures/wemeeter_logo_test.png';
 
 const posts = [
     { id: 1, title: "New Spider-Man movie", desc: "i wanna watch new spider-man movie in Ulm cinema but not single.", dist: "2 km", avatar: "🦸‍♂️" },
@@ -15,8 +16,15 @@ const posts = [
     { id: 3, title: "uni party", desc: "“HALLO, ULM” PARTY NEXT MONDAY", dist: "3 km", avatar: "🎉" },
     { id: 4, title: "coffee, huh?", desc: "let's drink coffee. why not?", dist: "7 km", avatar: "☕️" },
     { id: 5, title: "Kloster Wiblingen", desc: "let's buy group ticket", dist: "9 km", avatar: "🏰" },
-    { id: 6, title: "New Spider-Man movie", desc: "i wanna watch new spider-man movie in Ulm cinema but not single.", dist: "2 km", avatar: "🦸‍♂️" },
-    { id: 7, title: "football next sunday", desc: "15 people are looking for 7 guys to play football on donaustadium", dist: "2.3 km", avatar: "⚽️" },
+    { id: 6, title: "New Spider-Man movie", desc: "i wanna watch new spider-man movie in Ulm cinema but not single.", dist: "12 km", avatar: "🦸‍♂️" },
+    { id: 7, title: "football next sunday", desc: "15 people are looking for 7 guys to play football on donaustadium", dist: "12.3 km", avatar: "⚽️" },
+    { id: 8, title: "fesfsfsgsg", desc: "i wanna watch new spider-man movie in Ulm cinema but not single.", dist: "12.3 km", avatar: "🦸‍♂️" },
+    { id: 9, title: "football next sunday", desc: "15 people are looking for 7 guys to play football on donaustadium", dist: "2.3 km", avatar: "⚽️" },
+    { id: 10, title: "uni party", desc: "“HALLO, ULM” PARTY NEXT MONDAY", dist: "3 km", avatar: "🎉" },
+    { id: 11, title: "coffee, huh?", desc: "let's drink coffee. why not?", dist: "7 km", avatar: "☕️" },
+    { id: 12, title: "Kloster Wiblingen", desc: "let's buy group ticket", dist: "9 km", avatar: "🏰" },
+    { id: 13, title: "anyone can play guitar", desc: "anyone can play guitar? ", dist: "10 km", avatar: "🦸‍♂️" },
+    { id: 14, title: "football next sunday", desc: "15 people are looking for 7 guys to play football on donaustadium", dist: "22.3 km", avatar: "⚽️" },
 ];
 
 const Sidebar = ({ isCollapsed, toggleSidebar }) => {
@@ -27,20 +35,22 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
         >
 
             {/* Logo */}
-            <div className="flex flex-col items-center py-6 pb-10 transition-all duration-300">
+            <div className="flex flex-col items-center py-6 transition-all duration-300">
                 <Link to="/" className="flex items-center justify-center">
                     {isCollapsed ? (
                         <HomeIcon sx={{ fontSize: 30 }} />
                     ) : (
-                        <p className="font-bold text-xl tracking-wider whitespace-nowrap animate-fade-in">
-                            weMeeter
-                        </p>
+                        <img
+                            src={wemeeter_logo}
+                            alt="weMeeter Logo"
+                            className="w-[80%] object-contain"
+                        />
                     )}
                 </Link>
             </div>
 
             {/* Menu Bar */}
-            <div className={`flex items-center px-2 pb-4 transition-all duration-300 ${isCollapsed ? 'flex-col gap-6 mt-4' : 'flex-row justify-between px-7'}`}>
+            <div className={`flex items-center px-2 pb-4 transition-all duration-300 ${isCollapsed ? 'flex-col gap-6 mt-12' : 'flex-row justify-between px-7'}`}>
 
                 <IconButton
                     onClick={toggleSidebar}
