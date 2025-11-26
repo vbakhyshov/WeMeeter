@@ -2,7 +2,7 @@ import React from 'react';
 import IconButton from '@mui/material/IconButton';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import MenuIcon from '@mui/icons-material/Menu';
 import SyncIcon from '@mui/icons-material/Sync';
@@ -27,7 +27,7 @@ const posts = [
     { id: 14, title: "football next sunday", desc: "15 people are looking for 7 guys to play football on donaustadium", dist: "22.3 km", avatar: "⚽️" },
 ];
 
-const Sidebar = ({ isCollapsed, toggleSidebar }) => {
+const Sidebar = ({ isCollapsed, toggleSidebar, onOpenCreatePost }) => {
 
     return (
         <div
@@ -71,17 +71,16 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                     </IconButton>
                 </Link>
 
-                <Link to="/notifications">
-                    <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}>
-                        <NotificationsNoneIcon fontSize="medium" />
-                    </IconButton>
-                </Link>
+                <IconButton
+                            sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}>
+                    <FavoriteIcon fontSize="medium" />
+                </IconButton>
 
-                <Link to="/newpost">
-                    <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}>
-                        <AddCircleOutlineRoundedIcon fontSize="medium" />
-                    </IconButton>
-                </Link>
+                <IconButton
+                    onClick={onOpenCreatePost}
+                    sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}>
+                    <AddCircleOutlineRoundedIcon fontSize="medium" />
+                </IconButton>
             </div>
 
             {/* --- SEARCH FIELD --- */}

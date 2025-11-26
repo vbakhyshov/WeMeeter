@@ -17,7 +17,7 @@ export const mainu = [
         activeIcon: <MdChatBubbleOutline />
     },
     {
-        title: "Notifications",
+        title: "CreatePost",
         icon: <MdNotificationsNone />,
         activeIcon: <MdNotificationsNone />
     },
