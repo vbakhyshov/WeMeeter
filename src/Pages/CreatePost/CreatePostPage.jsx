@@ -16,15 +16,22 @@ const currentUser = {
     age: "21"
 };
 
+const SUGGESTED_TAGS = [
+    "🎥 Movie", "☕️ Coffee", "🧑‍🧑‍🧒‍🧒 Subscription",
+    "🎫 Ticket", "⚽️ Sport", "🎉 Party",
+    "🏞️ Hang out", "🍕 Eat out"
+];
+
 export default function CreatePostPage({ onClose }) {
-    // 1. Создаем два отдельных состояния для заголовка и описания
     const [title, setTitle] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [mediaPreview, setMediaPreview] = React.useState(null);
 
+    const [tags, setTags] = React.useState([]);
+    const [tagInput, setTagInput] = React.useState('');
+
     const handlePost = () => {
-        // Логируем оба поля
-        console.log("Posting:", { title, description });
+        console.log("Posting:", { title, description, tags });
         if (onClose) onClose();
     };
 
@@ -32,7 +39,26 @@ export default function CreatePostPage({ onClose }) {
         setMediaPreview("https://cdn.pixabay.com/photo/2023/11/10/21/13/paella-8380096_1280.png");
     }
 
-    // Кнопка активна, если есть (Заголовок ИЛИ Описание) ИЛИ Картинка
+    const handleAddTag = (tagToAdd) => {
+        if (!tags.includes(tagToAdd)) {
+            setTags([...tags, tagToAdd]);
+        }
+    };
+
+    const handleDeleteTag = (tagToDelete) => {
+        setTags(tags.filter((tag) => tag !== tagToDelete));
+    };
+
+    const handleTagInputKeyDown = (e) => {
+        if (e.key === 'Enter' && tagInput.trim()) {
+            e.preventDefault(); // Чтобы не переносило строку
+            if (!tags.includes(tagInput.trim())) {
+                setTags([...tags, tagInput.trim()]);
+            }
+            setTagInput(''); // Очищаем поле
+        }
+    };
+
     const isPostDisabled = (!title.trim() && !description.trim() && !mediaPreview);
 
     return (
@@ -107,27 +133,55 @@ export default function CreatePostPage({ onClose }) {
                         }}
                     />
 
-                    {/* TAGS */}
+                    {/* SELECTED TAGS DISPLAY*/}
+                    {tags.length > 0 && (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
+                            {tags.map((tag, index) => (
+                                <Chip
+                                    key={index}
+                                    label={tag}
+                                    onDelete={() => handleDeleteTag(tag)}
+                                    color="primary"
+                                    size="small"
+                                />
+                            ))}
+                        </Box>
+                    )}
+
                     <TextField
                         fullWidth
-                        multiline
-                        minRows={3}
-                        placeholder="Share your thoughts, description or details..."
+                        placeholder="Add tags (press Enter to add custom)..."
                         variant="standard"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={handleTagInputKeyDown}
                         InputProps={{
                             disableUnderline: true,
-                            sx: {
-                                fontSize: '1rem',
-                                color: 'text.primary',
-                                lineHeight: 1.5
-                            }
+                            startAdornment: <LocalOfferIcon sx={{ color: 'text.secondary', mr: 1, fontSize: 20 }} />,
+                            sx: { fontSize: '0.9rem', color: 'text.secondary' }
                         }}
                     />
-                    <Stack direction="row" spacing={1}>
-                        <Chip label="Deletable"/>
-                        <Chip label="Deletable" variant="outlined" />
+
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                        Suggestions:
+                    </Typography>
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        useFlexGap
+                        flexWrap="wrap"
+                        sx={{ mt: 1 }}
+                    >
+                        {SUGGESTED_TAGS.map((tag) => (
+                            <Chip
+                                key={tag}
+                                label={tag}
+                                variant="outlined"
+                                onClick={() => handleAddTag(tag)}
+                                clickable
+                                disabled={tags.includes(tag)}
+                            />
+                        ))}
                     </Stack>
                 </Box>
 
