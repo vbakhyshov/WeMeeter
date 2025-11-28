@@ -28,7 +28,7 @@ const HomePage = () => {
     return (
         // Твой div-контейнер. h-screen - это хорошо, он дает карте высоту.
         // Я убрал flex items-center, чтобы карта заняла все место.
-        <div className="h-screen w-full">
+        <div className="h-screen w-full relative z-0">
 
             <MapContainer
                 center={defaultPosition} // Центрируем карту на нашей позиции

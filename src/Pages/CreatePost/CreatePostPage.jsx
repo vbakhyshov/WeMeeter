@@ -2,7 +2,7 @@ import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
-import { TextField, Box, Typography } from "@mui/material";
+import {TextField, Box, Typography, Chip, Stack} from "@mui/material";
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
@@ -106,6 +106,29 @@ export default function CreatePostPage({ onClose }) {
                             }
                         }}
                     />
+
+                    {/* TAGS */}
+                    <TextField
+                        fullWidth
+                        multiline
+                        minRows={3}
+                        placeholder="Share your thoughts, description or details..."
+                        variant="standard"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        InputProps={{
+                            disableUnderline: true,
+                            sx: {
+                                fontSize: '1rem',
+                                color: 'text.primary',
+                                lineHeight: 1.5
+                            }
+                        }}
+                    />
+                    <Stack direction="row" spacing={1}>
+                        <Chip label="Deletable"/>
+                        <Chip label="Deletable" variant="outlined" />
+                    </Stack>
                 </Box>
 
                 {/* MEDIA PREVIEW */}

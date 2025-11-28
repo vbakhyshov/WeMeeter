@@ -4,7 +4,7 @@ import pic2 from '../../Pictures/pfp_2.JPG'
 import pic3 from '../../Pictures/pfp_3.JPG'
 import pic4 from '../../Pictures/pfp_4.JPG'
 import pic5 from '../../Pictures/pfp_5.JPG'
-
+import VerifiedIcon from '@mui/icons-material/Verified';
 
 const testProfile = [
     {
@@ -24,7 +24,8 @@ const testProfile = [
         bio: "I love playing and watching football. I study computer sciences in THU (Ulm). I usually play table tennis in evening.",
         interestsBio: "Football, Movies, IT, Table Tennis, Computer Games",
         languagesBio: "English, Ukrainian, russian, Azerbaijani, German",
-        countriesBio: "Ukraine, Turkey, Germany, Italy, France, Switzerland, Azerbaijan, Georgia, Vatican"
+        countriesBio: "Ukraine, Turkey, Germany, Italy, France, Switzerland, russia, Azerbaijan, Georgia, Vatican",
+        verified: true,
     },
 ];
 
@@ -52,6 +53,13 @@ const ProfileUserDetails = () => {
                     <div className="flex flex-col gap-2 text-left pt-4">
                         <h1 className="text-3xl font-bold">
                             {user.name} {user.surname}
+
+                            {user.verified && (
+                                <VerifiedIcon
+                                    className="text-[#BA4631]"
+                                    sx={{ fontSize: 30 }}
+                                />
+                            )}
                         </h1>
                         <h1 className="font-bold text-xl text-gray-500">
                             @{user.username}

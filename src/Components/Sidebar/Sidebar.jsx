@@ -27,7 +27,15 @@ const posts = [
     { id: 14, title: "football next sunday", desc: "15 people are looking for 7 guys to play football on donaustadium", dist: "22.3 km", avatar: "⚽️" },
 ];
 
-const Sidebar = ({ isCollapsed, toggleSidebar, onOpenCreatePost }) => {
+const Sidebar = ({ isCollapsed, toggleSidebar, onOpenCreatePost, onOpenNotifications, onCloseNotifications, isNotifOpen }) => {
+
+    const handleNotificationClick = () => {
+        if (isNotifOpen) {
+            onCloseNotifications();
+        } else {
+            onOpenNotifications();
+        }
+    };
 
     return (
         <div
@@ -72,7 +80,8 @@ const Sidebar = ({ isCollapsed, toggleSidebar, onOpenCreatePost }) => {
                 </Link>
 
                 <IconButton
-                            sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}>
+                    onClick={handleNotificationClick}
+                    sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}>
                     <FavoriteIcon fontSize="medium" />
                 </IconButton>
 
@@ -97,7 +106,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar, onOpenCreatePost }) => {
                 </div>
             </div>
 
-            {/* --- POSTS LIST --- */}
+            {/* POSTS */}
             <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-4 custom-scrollbar">
                 {posts.map((post) => (
                     <div
@@ -105,7 +114,6 @@ const Sidebar = ({ isCollapsed, toggleSidebar, onOpenCreatePost }) => {
                         className={`flex items-start gap-3 cursor-pointer hover:bg-white/10 p-2 rounded-xl transition-all duration-200 
                         ${isCollapsed ? 'justify-center' : 'justify-start'}`}
                     >
-                        {/* Avatar & Distance Column */}
                         <div className="flex flex-col items-center flex-shrink-0">
                             <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center text-xl shadow-sm">
                                 {post.avatar}
@@ -115,7 +123,6 @@ const Sidebar = ({ isCollapsed, toggleSidebar, onOpenCreatePost }) => {
                             </span>
                         </div>
 
-                        {/* Text Content */}
                         {!isCollapsed && (
                             <div className="flex flex-col text-left overflow-hidden pt-0.5">
                                 <h3 className="font-bold text-sm leading-tight mb-1 truncate">{post.title}</h3>
@@ -127,6 +134,26 @@ const Sidebar = ({ isCollapsed, toggleSidebar, onOpenCreatePost }) => {
                     </div>
                 ))}
             </div>
+
+            {/* FOOTER */}
+            {!isCollapsed && (
+                <div className={'py-4 text-center border-t border-white/20 transition-all duration-300 block'}>
+                    <p className="text-[10px] text-white/60">
+                        Vahid Bakhyshov 2025
+                    </p>
+                </div>
+            )}
+
+            {isCollapsed && (
+                <div className={'py-4 text-center border-t border-white/20 transition-all duration-300 block'}>
+                    <p className="text-[10px] text-white/60">
+                        Bakhyshov
+                    </p>
+                </div>
+            )}
+
+
+
 
         </div>
     )
