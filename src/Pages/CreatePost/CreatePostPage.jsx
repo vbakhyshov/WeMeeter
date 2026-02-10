@@ -12,8 +12,8 @@ import CloseIcon from '@mui/icons-material/Close';
 const currentUser = {
     avatar: "https://cdn.pixabay.com/photo/2023/08/20/20/36/irish-setter-8203156_1280.jpg",
     username: "vbakhyshov",
-    location: "Ulm, Germany",
-    age: "21"
+    location: "Location",
+    age: "Age"
 };
 
 const SUGGESTED_TAGS = [

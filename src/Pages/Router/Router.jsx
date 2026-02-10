@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Sidebar from "../../Components/Sidebar/Sidebar";
 import HomePage from "../HomePage/HomePage";
+import LoginPage from "../LogSign/LoginPage";
+import SignupPage from "../LogSign/SignupPage";
 import Profile from "../Profile/Profile";
 import Messages from "../Messages/MessagesPage";
 import CreatePostOverlay from "../CreatePost/CreatePostOverlay";
 import NotificationsDrawer from '../../Components/Notifications/NotificationsDrawer';
+import ProtectedRoute from "./ProtectedRoute";
 
 const dummyNotifications = [
     { username: "ege_azgul", friendAvatar: "https://cdn.pixabay.com/photo/2025/08/09/17/47/modelling-9764984_1280.jpg", actionEvent: "made a post", when: "1m ago" },
@@ -20,21 +23,19 @@ const Router = () => {
 
     const location = useLocation();
 
+    const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+
     const openNotifications = () => setIsNotifOpen(true);
     const closeNotifications = () => setIsNotifOpen(false);
 
     useEffect(() => {
         setIsNotifOpen(false);
+
         if (location.pathname === '/messages') {
             setIsCollapsed(true);
-            setIsNotifOpen(false);
         }
         if (location.pathname === '/') {
             setIsCollapsed(false);
-            setIsNotifOpen(false);
-        }
-        if (location.pathname === '/me') {
-
         }
     }, [location.pathname]);
 
@@ -43,43 +44,48 @@ const Router = () => {
     };
 
     return (
-        <div>
+        <div className="flex min-h-screen bg-gray-100">
             {/* 1. Sidebar */}
-            <div className={`fixed top-0 left-0 h-screen transition-all duration-300 ease-in-out z-50 ${isCollapsed ? 'w-20' : 'w-80'}`}>
-                <Sidebar
-                    isCollapsed={isCollapsed}
-                    toggleSidebar={toggleSidebar}
-                    onOpenCreatePost={() => setCreatePost(true)}
-                    isNotifOpen={isNotifOpen}
-                    onOpenNotifications={openNotifications}
-                    onCloseNotifications={closeNotifications}
-                />
-            </div>
+            {!isAuthPage && (
+                <div className={`fixed top-0 left-0 h-screen transition-all duration-300 z-40 ${isCollapsed ? 'w-20' : 'w-80'}`}>
+                    <Sidebar
+                        isCollapsed={isCollapsed}
+                        toggleSidebar={toggleSidebar}
+                        onOpenCreatePost={() => setCreatePost(true)}
+                        isNotifOpen={isNotifOpen}
+                        onOpenNotifications={openNotifications}
+                        onCloseNotifications={closeNotifications}
+                    />
+                </div>
+            )}
 
-            {/* 2. Routes */}
-            <div className={`transition-all duration-300 ease-in-out ${isCollapsed ? 'ml-20' : 'ml-80'}`}>
+            <div className={`flex-1 transition-all duration-300 ${!isAuthPage ? (isCollapsed ? 'ml-20' : 'ml-80') : ''}`}>
                 <Routes>
-                    <Route path='/' element={<HomePage />}></Route>
-                    <Route path='/me' element={<Profile />}></Route>
-                    <Route path='/messages' element={<Messages />}></Route>
+                    <Route path='/login' element={<LoginPage/>}/>
+                    <Route path='/signup' element={<SignupPage/>}/>
+
+                    <Route path='/' element={<ProtectedRoute><HomePage/></ProtectedRoute>}/>
+                    <Route path='/me' element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
+                    <Route path='/messages' element={<ProtectedRoute><Messages/></ProtectedRoute>}/>
                 </Routes>
             </div>
 
-            {/* Create Post */}
+            {isNotifOpen && (
+                <div className="z-50">
+                    <NotificationsDrawer
+                        isOpen={isNotifOpen}
+                        onClose={closeNotifications}
+                        notifications={dummyNotifications}
+                        isSidebarCollapsed={isCollapsed}
+                    />
+                </div>
+            )}
+
             {showCreatePost && (
                 <CreatePostOverlay onClose={() => setCreatePost(false)} />
             )}
-
-            {/* NotificationsDrawer */}
-            <NotificationsDrawer
-                isOpen={isNotifOpen}
-                onClose={() => setIsNotifOpen(false)}
-                notifications={dummyNotifications}
-                isSidebarCollapsed={isCollapsed}
-            />
-
         </div>
-    )
+    );
 }
 
 export default Router;

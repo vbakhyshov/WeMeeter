@@ -3,8 +3,9 @@ import pic1 from '../../Pictures/pfp_1.JPG'
 import pic2 from '../../Pictures/pfp_2.JPG'
 import pic3 from '../../Pictures/pfp_3.JPG'
 import pic4 from '../../Pictures/pfp_4.JPG'
-import pic5 from '../../Pictures/pfp_5.JPG'
 import VerifiedIcon from '@mui/icons-material/Verified';
+import Button from "@mui/material/Button";
+import { auth } from '../../firebase/firebase';
 
 const testProfile = [
     {
@@ -13,16 +14,15 @@ const testProfile = [
         name: "Vahid",
         surname: "Bakhyshov",
         avatar: "https://cdn.pixabay.com/photo/2023/08/20/20/36/irish-setter-8203156_1280.jpg",
-        age: "21",
-        nationality: "Ukraine",
+        age: "Age",
+        nationality: "Nationality",
         location: "Ulm",
         picture1: pic1,
         picture2: pic2,
         picture3: pic3,
         picture4: pic4,
-        picture5: pic5,
-        bio: "I love playing and watching football. I study computer sciences in THU (Ulm). I usually play table tennis in evening.",
-        interestsBio: "Football, Movies, IT, Table Tennis, Computer Games",
+        bio: "I love playing and watching football. I study Computer Science in THU (Ulm). I usually play table tennis",
+        interestsBio: "IT, Football, Movies, Table Tennis, Computer Games",
         languagesBio: "English, Ukrainian, russian, Azerbaijani, German",
         countriesBio: "Ukraine, Turkey, Germany, Italy, France, Switzerland, russia, Azerbaijan, Georgia, Vatican",
         verified: true,
@@ -98,15 +98,12 @@ const ProfileUserDetails = () => {
                     </div>
                 </div>
 
-                {/* Родительский контейнер с ограничением ширины (max-w-3xl) */}
                 <div className="flex flex-col items-center max-w-3xl mx-auto gap-6 px-6 w-full pb-20">
 
-                    {/* Разделитель (если нужен) */}
                     <hr className="w-full border-gray-300 my-2" />
 
-                    {/* 1. КОЛЛАЖ */}
+                    {/* Collage */}
                     <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8 text-left">
-                        {/* Изменил h-96 на h-[600px] и sm:h-[500px] на sm:h-[800px] */}
                         <div className="grid grid-cols-2 grid-rows-2 gap-4 h-[600px] sm:h-[800px]">
                             <img src={pic1} className="w-full h-full object-cover rounded-2xl" alt="1" />
                             <img src={pic2} className="w-full h-full object-cover rounded-2xl" alt="2" />
@@ -115,7 +112,7 @@ const ProfileUserDetails = () => {
                         </div>
                     </div>
 
-                    {/* 2. BIO */}
+                    {/* BIO */}
                     <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8 text-left">
                         <h2 className="text-2xl font-bold mb-4 text-black">
                             Bio
@@ -125,7 +122,7 @@ const ProfileUserDetails = () => {
                         </p>
                     </div>
 
-                    {/* 3. HOBBIES */}
+                    {/* HOBBIES */}
                     <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8 text-left">
                         <h2 className="text-2xl font-bold mb-4 text-black">
                             Interests
@@ -135,7 +132,7 @@ const ProfileUserDetails = () => {
                         </p>
                     </div>
 
-                    {/* 4. LANGUAGES */}
+                    {/* LANGUAGES */}
                     <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8 text-left">
                         <h2 className="text-2xl font-bold mb-4 text-black">
                             Languages
@@ -145,16 +142,34 @@ const ProfileUserDetails = () => {
                         </p>
                     </div>
 
-                    {/* 5. COUNTRIES */}
+                    {/* COUNTRIES */}
                     <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8 text-left">
                         <h2 className="text-2xl font-bold mb-4 text-black">
-                            Countries
+                            Countries and Territories
                         </h2>
                         <p className="text-lg text-gray-700 leading-relaxed">
                             {user.countriesBio}
                         </p>
                     </div>
 
+                    {/* SETTINGS AND LOGOUT */}
+                    <div className={'space-x-16'}>
+                        <Button
+                            sx={{
+                                color: "grey",
+                            }}
+                        >
+                            Settings
+                        </Button>
+                        <Button
+                            onClick={{}}
+                            sx={{
+                                color: "red",
+                            }}
+                        >
+                            Logout
+                        </Button>
+                    </div>
                 </div>
             </div>
 
