@@ -22,8 +22,17 @@ const SignupPage = () => {
                 email: email,
                 uid: user.uid,
                 createdAt: new Date(),
+                verified: false,
                 avatar: "",
-                verified: false
+                name: "",
+                surname: "",
+                age: "",
+                nationality: "",
+                location: "",
+                interestsBio: "",
+                languagesBio: "",
+                countriesBio: "",
+                bio: ""
             });
 
             console.log("Registered and Profile Created!");

@@ -7,22 +7,23 @@ import SignupPage from "../LogSign/SignupPage";
 import Profile from "../Profile/Profile";
 import Messages from "../Messages/MessagesPage";
 import CreatePostOverlay from "../CreatePost/CreatePostOverlay";
-import NotificationsDrawer from '../../Components/Notifications/NotificationsDrawer';
+import NotificationsDrawer from "../../Components/Notifications/NotificationsDrawer";
 import ProtectedRoute from "./ProtectedRoute";
+import EditProfilePage from "../../Components/ProfileComponents/EditProfilePage";
 
-const dummyNotifications = [
-    { username: "ege_azgul", friendAvatar: "https://cdn.pixabay.com/photo/2025/08/09/17/47/modelling-9764984_1280.jpg", actionEvent: "made a post", when: "1m ago" },
-    { username: "directed_by_daria", friendAvatar: "https://cdn.pixabay.com/photo/2025/09/22/17/45/vietnam-9849104_1280.jpg", actionEvent: "made a post", when: "3m ago" },
-    { username: "mynameisyolop", friendAvatar: "https://cdn.pixabay.com/photo/2023/07/16/23/03/mask-8131581_1280.jpg", actionEvent: "viewed your profile", when: "10m ago" },
-];
+import { auth, db } from "../../firebase/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 const Router = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [showCreatePost, setCreatePost] = useState(false);
 
-    const location = useLocation();
+    const [unreadNotifsCount, setUnreadNotifsCount] = useState(0);
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
+    const location = useLocation();
     const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
     const openNotifications = () => setIsNotifOpen(true);
@@ -31,7 +32,7 @@ const Router = () => {
     useEffect(() => {
         setIsNotifOpen(false);
 
-        if (location.pathname === '/messages') {
+        if (location.pathname.startsWith('/messages')) {
             setIsCollapsed(true);
         }
         if (location.pathname === '/') {
@@ -39,15 +40,59 @@ const Router = () => {
         }
     }, [location.pathname]);
 
+    // reliable realtime listeners
+    useEffect(() => {
+        let unsubscribeNotifs = () => {};
+        let unsubscribeChats = () => {};
+
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            unsubscribeNotifs();
+            unsubscribeChats();
+
+            if (user) {
+                const notifQuery = query(
+                    collection(db, "notifications"),
+                    where("recipientId", "==", user.uid)
+                );
+
+                unsubscribeNotifs = onSnapshot(notifQuery, (snapshot) => {
+                    const unreadCount = snapshot.docs.filter((d) => d.data().read === false).length;
+                    setUnreadNotifsCount(unreadCount);
+                }, (error) => {
+                    console.error("Live notifs error:", error);
+                });
+
+                const chatsQuery = query(
+                    collection(db, "chats"),
+                    where("unreadBy", "array-contains", user.uid)
+                );
+
+                unsubscribeChats = onSnapshot(chatsQuery, (snapshot) => {
+                    setUnreadMessagesCount(snapshot.size);
+                }, (error) => {
+                    console.error("Live chats error:", error);
+                });
+            } else {
+                setUnreadNotifsCount(0);
+                setUnreadMessagesCount(0);
+            }
+        });
+
+        return () => {
+            unsubscribeAuth();
+            unsubscribeNotifs();
+            unsubscribeChats();
+        };
+    }, []);
+
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed);
     };
 
     return (
-        <div className="flex min-h-screen bg-gray-100">
-            {/* 1. Sidebar */}
+        <div className="flex min-h-screen bg-gray-100 relative">
             {!isAuthPage && (
-                <div className={`fixed top-0 left-0 h-screen transition-all duration-300 z-40 ${isCollapsed ? 'w-20' : 'w-80'}`}>
+                <div className={`fixed top-0 left-0 h-screen transition-all duration-300 z-50 ${isCollapsed ? 'w-20' : 'w-80'}`}>
                     <Sidebar
                         isCollapsed={isCollapsed}
                         toggleSidebar={toggleSidebar}
@@ -55,30 +100,32 @@ const Router = () => {
                         isNotifOpen={isNotifOpen}
                         onOpenNotifications={openNotifications}
                         onCloseNotifications={closeNotifications}
+                        unreadNotifsCount={unreadNotifsCount}
+                        unreadMessagesCount={unreadMessagesCount}
                     />
                 </div>
             )}
 
             <div className={`flex-1 transition-all duration-300 ${!isAuthPage ? (isCollapsed ? 'ml-20' : 'ml-80') : ''}`}>
                 <Routes>
-                    <Route path='/login' element={<LoginPage/>}/>
-                    <Route path='/signup' element={<SignupPage/>}/>
+                    <Route path='/login' element={<LoginPage />} />
+                    <Route path='/signup' element={<SignupPage />} />
 
-                    <Route path='/' element={<ProtectedRoute><HomePage/></ProtectedRoute>}/>
-                    <Route path='/me' element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
-                    <Route path='/messages' element={<ProtectedRoute><Messages/></ProtectedRoute>}/>
+                    <Route path='/' element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+                    <Route path='/me' element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                    <Route path='/profile/:userId' element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                    <Route path='/edit-profile' element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
+                    <Route path='/messages' element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+                    <Route path='/messages/:targetUserId' element={<ProtectedRoute><Messages /></ProtectedRoute>} />
                 </Routes>
             </div>
 
-            {isNotifOpen && (
-                <div className="z-50">
-                    <NotificationsDrawer
-                        isOpen={isNotifOpen}
-                        onClose={closeNotifications}
-                        notifications={dummyNotifications}
-                        isSidebarCollapsed={isCollapsed}
-                    />
-                </div>
+            {!isAuthPage && (
+                <NotificationsDrawer
+                    isOpen={isNotifOpen}
+                    onClose={closeNotifications}
+                    isSidebarCollapsed={isCollapsed}
+                />
             )}
 
             {showCreatePost && (
@@ -86,6 +133,6 @@ const Router = () => {
             )}
         </div>
     );
-}
+};
 
 export default Router;
