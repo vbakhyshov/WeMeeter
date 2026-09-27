@@ -15,6 +15,8 @@ import { auth, db } from "../../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 
+import SettingsPage from "../Settings/SettingsPage"; // путь к твоему компоненту
+
 const Router = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -90,7 +92,7 @@ const Router = () => {
     };
 
     return (
-        <div className="flex min-h-screen bg-gray-100 relative">
+        <div className="flex min-h-screen bg-gray-100 dark:bg-[#121212] text-gray-900 dark:text-gray-100 transition-colors duration-300 relative">
             {!isAuthPage && (
                 <div className={`fixed top-0 left-0 h-screen transition-all duration-300 z-50 ${isCollapsed ? 'w-20' : 'w-80'}`}>
                     <Sidebar
@@ -117,6 +119,8 @@ const Router = () => {
                     <Route path='/edit-profile' element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
                     <Route path='/messages' element={<ProtectedRoute><Messages /></ProtectedRoute>} />
                     <Route path='/messages/:targetUserId' element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+                    <Route path='/settings' element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+
                 </Routes>
             </div>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
@@ -22,9 +22,14 @@ import {
 const NotificationsDrawer = ({ isOpen, onClose, isSidebarCollapsed }) => {
     const [notifications, setNotifications] = useState([]);
     const [activeUser, setActiveUser] = useState(null);
+    const notificationsRef = useRef([]);
     const navigate = useNavigate();
 
-    // listen notifs in real time
+    useEffect(() => {
+        notificationsRef.current = notifications;
+    }, [notifications]);
+
+    // listen notif in realtime
     useEffect(() => {
         let unsubscribeSnapshot = null;
 
@@ -65,48 +70,38 @@ const NotificationsDrawer = ({ isOpen, onClose, isSidebarCollapsed }) => {
         };
     }, []);
 
-    // all notifs are read
-    useEffect(() => {
-        if (!isOpen || !activeUser || notifications.length === 0) return;
-
-        const unreadDocs = notifications.filter(n => n.read === false);
+    // read status
+    const markUnreadAsRead = async () => {
+        if (!activeUser) return;
+        const unreadDocs = notificationsRef.current.filter((n) => n.read === false);
         if (unreadDocs.length === 0) return;
 
-        const markAsRead = async () => {
-            const batch = writeBatch(db);
-            unreadDocs.forEach((item) => {
-                batch.update(doc(db, "notifications", item.id), { read: true });
-            });
-            try {
-                await batch.commit();
-            } catch (err) {
-                console.error("Error marking notifications as read:", err);
-            }
-        };
+        const batch = writeBatch(db);
+        unreadDocs.forEach((item) => {
+            batch.update(doc(db, "notifications", item.id), { read: true });
+        });
 
-        markAsRead();
-    }, [isOpen, activeUser, notifications]);
-
-    // close notifs read
-    const handleCloseDrawer = async () => {
-        if (activeUser) {
-            const unreadDocs = notifications.filter(n => n.read === false);
-            if (unreadDocs.length > 0) {
-                const batch = writeBatch(db);
-                unreadDocs.forEach((item) => {
-                    batch.update(doc(db, "notifications", item.id), { read: true });
-                });
-                try {
-                    await batch.commit();
-                } catch (e) {
-                    console.error(e);
-                }
-            }
+        try {
+            await batch.commit();
+        } catch (err) {
+            console.error("Error marking notifications as read:", err);
         }
+    };
+
+    // reset unread
+    useEffect(() => {
+        if (isOpen && activeUser) {
+            markUnreadAsRead();
+        }
+    }, [isOpen, activeUser]);
+
+    // close to read
+    const handleCloseDrawer = async () => {
+        await markUnreadAsRead();
         onClose();
     };
 
-    // accept friend
+    // accept
     const handleAccept = async (notif) => {
         if (!activeUser) return;
 
@@ -129,7 +124,7 @@ const NotificationsDrawer = ({ isOpen, onClose, isSidebarCollapsed }) => {
         }
     };
 
-    // decline friend req
+    // reject
     const handleDecline = async (notif) => {
         setNotifications((prev) => prev.filter((item) => item.id !== notif.id));
 
@@ -188,15 +183,15 @@ const NotificationsDrawer = ({ isOpen, onClose, isSidebarCollapsed }) => {
 
             <div
                 className={`
-                    fixed top-0 h-screen w-80 bg-white shadow-2xl z-40
-                    transition-all duration-300 ease-in-out border-r border-gray-200
+                    fixed top-0 h-screen w-80 bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-gray-100 shadow-2xl z-40
+                    transition-all duration-300 ease-in-out border-r border-gray-200 dark:border-zinc-800
                     ${isSidebarCollapsed ? 'left-20' : 'left-80'}
                     ${isOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'}
                 `}
             >
-                {/* Header Clear All */}
-                <div className="flex justify-between items-center px-4 py-3 border-b">
-                    <h2 className="text-lg font-bold text-gray-800">Notifications</h2>
+                {/* Header */}
+                <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-zinc-800">
+                    <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Notifications</h2>
 
                     <div className="flex items-center gap-1">
                         {notifications.length > 0 && (
@@ -217,7 +212,7 @@ const NotificationsDrawer = ({ isOpen, onClose, isSidebarCollapsed }) => {
                                 Clear all
                             </Button>
                         )}
-                        <IconButton onClick={handleCloseDrawer} size="small">
+                        <IconButton onClick={handleCloseDrawer} size="small" sx={{ color: 'inherit' }}>
                             <CloseIcon />
                         </IconButton>
                     </div>
@@ -237,7 +232,7 @@ const NotificationsDrawer = ({ isOpen, onClose, isSidebarCollapsed }) => {
                             />
                         ))
                     ) : (
-                        <div className="text-center text-gray-400 text-sm py-12">
+                        <div className="text-center text-gray-400 dark:text-zinc-500 text-sm py-12">
                             No notifications yet
                         </div>
                     )}

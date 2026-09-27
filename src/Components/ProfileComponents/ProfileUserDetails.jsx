@@ -28,6 +28,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import Avatar from "@mui/material/Avatar";
+import Tooltip from "@mui/material/Tooltip";
 
 const DEFAULT_AVATAR = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
@@ -90,7 +91,6 @@ const ProfileUserDetails = () => {
     useEffect(() => {
         if (!currentAuthUser || !targetUid || isMyProfile) return;
 
-        // find my req
         const qOut = query(
             collection(db, "notifications"),
             where("senderId", "==", currentAuthUser.uid),
@@ -105,7 +105,6 @@ const ProfileUserDetails = () => {
             }
         });
 
-        // find req to me
         const qIn = query(
             collection(db, "notifications"),
             where("senderId", "==", targetUid),
@@ -128,7 +127,6 @@ const ProfileUserDetails = () => {
 
     const isFriend = Boolean(myUserData?.friends?.includes(targetUid));
 
-    // obtain friend req
     const handleFriendAction = async () => {
         if (!currentAuthUser || !targetUid || isActionLoading) return;
         setIsActionLoading(true);
@@ -138,19 +136,15 @@ const ProfileUserDetails = () => {
             const targetRef = doc(db, "users", targetUid);
 
             if (isFriend) {
-                // remove friend
                 await updateDoc(myRef, { friends: arrayRemove(targetUid) });
                 await updateDoc(targetRef, { friends: arrayRemove(currentAuthUser.uid) });
             } else if (incomingRequestDocId) {
-                // if he sent req too -> accept
                 await updateDoc(myRef, { friends: arrayUnion(targetUid) });
                 await updateDoc(targetRef, { friends: arrayUnion(currentAuthUser.uid) });
                 await deleteDoc(doc(db, "notifications", incomingRequestDocId));
             } else if (outgoingRequestDocId) {
-                // if I already sent, cancel
                 await deleteDoc(doc(db, "notifications", outgoingRequestDocId));
             } else {
-                // send friend req
                 await addDoc(collection(db, "notifications"), {
                     type: "friend_request",
                     status: "pending",
@@ -203,7 +197,7 @@ const ProfileUserDetails = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen bg-gray-100">
+            <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-[#121212]">
                 <CircularProgress sx={{ color: '#BA4631' }} />
             </div>
         );
@@ -211,8 +205,8 @@ const ProfileUserDetails = () => {
 
     if (!userData) {
         return (
-            <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 gap-4">
-                <h2 className="text-2xl font-bold text-gray-700">User not found</h2>
+            <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 dark:bg-[#121212] gap-4">
+                <h2 className="text-2xl font-bold text-gray-700 dark:text-zinc-300">User not found</h2>
                 <Button variant="contained" onClick={() => navigate("/")} sx={{ bgcolor: '#BA4631' }}>
                     Home
                 </Button>
@@ -242,21 +236,21 @@ const ProfileUserDetails = () => {
     else if (outgoingRequestDocId) friendButtonText = "Cancel Request";
 
     return (
-        <div className="flex w-full min-h-screen bg-gray-100">
+        <div className="flex w-full min-h-screen bg-gray-100 dark:bg-[#121212] text-gray-900 dark:text-zinc-100 transition-colors duration-300">
             <div className="w-[15%]"></div>
 
             <div className="w-[70%] py-10">
-                <div className="flex justify-center gap-20 mb-10">
+                <div className="flex justify-center gap-16 sm:gap-20 mb-10">
                     <div className="flex flex-col items-center">
                         <img
-                            className="w-48 h-48 rounded-full object-cover border-4 border-[#BA4631] bg-white shadow-md"
+                            className="w-44 h-44 sm:w-48 sm:h-48 rounded-full object-cover border-4 border-[#BA4631] bg-white dark:bg-zinc-800 shadow-md"
                             src={userData?.avatar || DEFAULT_AVATAR}
                             alt="avatar"
                         />
                     </div>
 
-                    <div className="flex flex-col gap-2 text-left pt-4">
-                        <h1 className="text-3xl font-bold flex items-center gap-2">
+                    <div className="flex flex-col gap-2 text-left pt-3">
+                        <h1 className="text-3xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
                             {userData?.name || userData?.surname
                                 ? `${userData?.name || ""} ${userData?.surname || ""}`.trim()
                                 : userData?.username || "No name"}
@@ -266,12 +260,20 @@ const ProfileUserDetails = () => {
                             )}
                         </h1>
 
-                        <h2 className="font-bold text-xl text-gray-500">
-                            @{userData?.username || "anonymous"}
-                        </h2>
+                        <Tooltip title="Click to copy username" arrow placement="top">
+                            <h2
+                                onClick={() => {
+                                    const username = userData?.username || "anonymous";
+                                    navigator.clipboard.writeText(`@${username}`);
+                                }}
+                                className="font-bold text-xl text-gray-500 dark:text-zinc-400 cursor-pointer hover:text-[#BA4631] dark:hover:text-[#BA4631] transition-colors w-fit select-none"
+                            >
+                                @{userData?.username || "anonymous"}
+                            </h2>
+                        </Tooltip>
 
-                        <p className="text-xl text-gray-700">
-                            {[userData?.nationality, userData?.age ? `${userData.age} y.o.` : "", userData?.location]
+                        <p className="text-base sm:text-lg text-gray-700 dark:text-zinc-300 font-medium">
+                            {[userData?.nationality, (!userData?.hideAge && userData?.age) ? `${userData.age} y.o.` : "", userData?.location]
                                 .filter(Boolean)
                                 .join(", ") || "No personal details yet"}
                         </p>
@@ -280,25 +282,24 @@ const ProfileUserDetails = () => {
                             {isMyProfile ? (
                                 <button
                                     onClick={() => navigate("/edit-profile")}
-                                    className="px-8 py-3 bg-[#BA4631] text-white font-semibold rounded-full shadow-md hover:bg-[#a33d2a] transition-colors duration-300"
+                                    className="px-8 py-2.5 bg-[#BA4631] text-white font-semibold rounded-full shadow-md hover:bg-[#a33d2a] transition-colors duration-300"
                                 >
                                     Edit
                                 </button>
                             ) : (
                                 <button
                                     onClick={() => navigate(`/messages/${userData.uid}`)}
-                                    className="px-8 py-3 bg-[#BA4631] text-white font-semibold rounded-full shadow-md hover:bg-[#a33d2a] transition-colors duration-300"
+                                    className="px-8 py-2.5 bg-[#BA4631] text-white font-semibold rounded-full shadow-md hover:bg-[#a33d2a] transition-colors duration-300"
                                 >
                                     Message
                                 </button>
                             )}
 
-                            {/* ADD FRIEND BUTTON */}
                             {isMyProfile ? (
                                 <button
                                     type="button"
                                     onClick={handleOpenFriendsDialog}
-                                    className="px-8 py-3 bg-white text-[#BA4631] font-semibold border-2 border-[#BA4631] rounded-full shadow-sm hover:bg-[#BA4631] hover:text-white transition-colors duration-300"
+                                    className="px-8 py-2.5 bg-white dark:bg-[#1e1e1e] text-[#BA4631] font-semibold border-2 border-[#BA4631] rounded-full shadow-sm hover:bg-[#BA4631] hover:text-white transition-colors duration-300"
                                 >
                                     Friends ({friendsCount})
                                 </button>
@@ -307,14 +308,14 @@ const ProfileUserDetails = () => {
                                     type="button"
                                     disabled={isActionLoading}
                                     onClick={handleFriendAction}
-                                    className={`px-8 py-3 font-semibold rounded-full shadow-sm transition-all duration-300 border-2 ${
+                                    className={`px-8 py-2.5 font-semibold rounded-full shadow-sm transition-all duration-300 border-2 ${
                                         isFriend
-                                            ? 'bg-gray-200 border-gray-300 text-gray-800 hover:bg-red-50 hover:text-red-600 hover:border-red-400'
+                                            ? 'bg-gray-200 dark:bg-zinc-800 border-gray-300 dark:border-zinc-700 text-gray-800 dark:text-zinc-200 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600'
                                             : outgoingRequestDocId
-                                                ? 'bg-amber-50 border-amber-400 text-amber-800 hover:bg-red-50 hover:text-red-600 hover:border-red-400'
+                                                ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-400 text-amber-800 dark:text-amber-200'
                                                 : incomingRequestDocId
                                                     ? 'bg-[#BA4631] border-[#BA4631] text-white hover:bg-[#a33d2a]'
-                                                    : 'bg-white text-[#BA4631] border-[#BA4631] hover:bg-[#BA4631] hover:text-white'
+                                                    : 'bg-white dark:bg-[#1e1e1e] text-[#BA4631] border-[#BA4631] hover:bg-[#BA4631] hover:text-white'
                                     }`}
                                 >
                                     {isActionLoading ? "Updating..." : friendButtonText}
@@ -325,11 +326,11 @@ const ProfileUserDetails = () => {
                 </div>
 
                 <div className="flex flex-col items-center max-w-3xl mx-auto gap-6 px-6 w-full pb-20">
-                    <hr className="w-full border-gray-300 my-2" />
+                    <hr className="w-full border-gray-200 dark:border-zinc-800 my-2" />
 
                     {photos.length > 0 && (
-                        <div className="w-full bg-white rounded-3xl shadow-lg p-8 text-left">
-                            <div className="grid grid-cols-2 grid-rows-2 gap-4 h-[600px] sm:h-[800px]">
+                        <div className="w-full bg-white dark:bg-[#181818] rounded-3xl shadow-sm p-8 text-left border border-gray-200/70 dark:border-zinc-800 transition-colors">
+                            <div className="grid grid-cols-2 grid-rows-2 gap-4 h-[500px] sm:h-[650px]">
                                 {photos.map((pic, idx) => (
                                     <img
                                         key={idx}
@@ -343,24 +344,27 @@ const ProfileUserDetails = () => {
                     )}
 
                     {sections.map((section, index) => (
-                        <div key={index} className="w-full bg-white rounded-3xl shadow-lg p-8 text-left">
-                            <h2 className="text-2xl font-bold mb-4 text-black">
+                        <div key={index} className="w-full bg-white dark:bg-[#181818] rounded-3xl shadow-sm p-8 text-left border border-gray-200/70 dark:border-zinc-800 transition-colors">
+                            <h2 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">
                                 {section.title}
                             </h2>
-                            <p className="text-lg text-gray-700 leading-relaxed whitespace-pre-line">
-                                {section.content || <span className="text-gray-400 italic">Not specified</span>}
+                            <p className="text-base sm:text-lg text-gray-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
+                                {section.content || <span className="text-gray-400 dark:text-zinc-500 italic">Not specified</span>}
                             </p>
                         </div>
                     ))}
 
                     {isMyProfile && (
-                        <div className="space-x-16 mt-8">
-                            <Button sx={{ color: "grey" }}>
+                        <div className="space-x-12 mt-6">
+                            <Button
+                                onClick={() => navigate("/settings")}
+                                sx={{ color: "text.secondary", fontWeight: "bold", textTransform: 'none', fontSize: '1rem' }}
+                            >
                                 Settings
                             </Button>
                             <Button
                                 onClick={handleLogout}
-                                sx={{ color: "red", fontWeight: "bold" }}
+                                sx={{ color: "#ef4444", fontWeight: "bold", textTransform: 'none', fontSize: '1rem' }}
                             >
                                 Logout
                             </Button>
@@ -371,20 +375,32 @@ const ProfileUserDetails = () => {
 
             <div className="w-[15%]"></div>
 
+            {/* list of dialogs */}
             <Dialog
                 open={openFriendsList}
                 onClose={() => setOpenFriendsList(false)}
                 fullWidth
                 maxWidth="xs"
+                PaperProps={{
+                    sx: {
+                        bgcolor: 'background.paper',
+                        backgroundImage: 'none',
+                        color: 'text.primary',
+                        borderRadius: '24px',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        p: 1
+                    }
+                }}
             >
-                <DialogTitle sx={{ fontWeight: 'bold', color: '#BA4631' }}>
+                <DialogTitle sx={{ fontWeight: 'bold', color: '#BA4631', pb: 1 }}>
                     Friends ({friendsDataList.length})
                 </DialogTitle>
-                <DialogContent dividers>
+                <DialogContent dividers sx={{ borderColor: 'divider' }}>
                     {friendsDataList.length === 0 ? (
-                        <p className="text-gray-400 text-center py-4">No friends added yet</p>
+                        <p className="text-gray-400 dark:text-zinc-500 text-center py-6">No friends added yet</p>
                     ) : (
-                        <List>
+                        <List sx={{ py: 0 }}>
                             {friendsDataList.map((f) => (
                                 <ListItem
                                     key={f.uid}
@@ -393,13 +409,28 @@ const ProfileUserDetails = () => {
                                         setOpenFriendsList(false);
                                         navigate(`/profile/${f.uid}`);
                                     }}
+                                    sx={{
+                                        borderRadius: '16px',
+                                        my: 0.5,
+                                        '&:hover': {
+                                            bgcolor: 'action.hover'
+                                        }
+                                    }}
                                 >
                                     <ListItemAvatar>
                                         <Avatar src={f.avatar || DEFAULT_AVATAR} />
                                     </ListItemAvatar>
                                     <ListItemText
-                                        primary={f.name || f.username}
-                                        secondary={`@${f.username || 'user'}`}
+                                        primary={
+                                            <span className="font-semibold text-gray-900 dark:text-zinc-100">
+                                                {f.name || f.username}
+                                            </span>
+                                        }
+                                        secondary={
+                                            <span className="text-xs text-gray-500 dark:text-zinc-400">
+                                                @{f.username || 'user'}
+                                            </span>
+                                        }
                                     />
                                 </ListItem>
                             ))}
