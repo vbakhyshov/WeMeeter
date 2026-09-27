@@ -16,6 +16,7 @@ import { auth, db } from '../../firebase/firebase';
 import { collection, query, onSnapshot, doc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
+
 const calculateDistanceKm = (coord1, coord2) => {
     if (!coord1 || !coord2 || coord1.length < 2 || coord2.length < 2) return null;
 
@@ -275,7 +276,7 @@ const Sidebar = ({
             {/* Footer */}
             <div className="py-4 text-center border-t border-white/20 transition-all duration-300 block">
                 <p className="text-[10px] text-white/60">
-                    {isCollapsed ? "Bakhyshov" : "Vahid Bakhyshov 2026"}
+                    {isCollapsed ? "Vahid Bakhyshov" : `Vahid Bakhyshov ${new Date().getFullYear()}`}
                 </p>
             </div>
         </div>
