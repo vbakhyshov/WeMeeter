@@ -15,7 +15,7 @@ import { auth, db } from "../../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 
-import SettingsPage from "../Settings/SettingsPage"; // путь к твоему компоненту
+import SettingsPage from "../Settings/SettingsPage";
 
 const Router = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { auth, db } from '../../firebase/firebase';
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import {
@@ -17,6 +17,7 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 
 const DEFAULT_AVATAR = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
@@ -53,6 +54,7 @@ const EditProfilePage = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
+    // Form data state
     const [formData, setFormData] = useState({
         avatar: "",
         name: "",
@@ -60,6 +62,8 @@ const EditProfilePage = () => {
         age: "",
         nationality: "",
         location: "",
+        city: "",
+        coordinates: null,
         interestsBio: "",
         languagesBio: "",
         countriesBio: "",
@@ -69,6 +73,12 @@ const EditProfilePage = () => {
         picture3: "",
         picture4: ""
     });
+
+    // Geocoding autocompletion state
+    const [addressQuery, setAddressQuery] = useState("");
+    const [addressResults, setAddressResults] = useState([]);
+    const [isSearchingAddress, setIsSearchingAddress] = useState(false);
+    const debounceTimerRef = useRef(null);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -84,6 +94,8 @@ const EditProfilePage = () => {
                             age: data.age || "",
                             nationality: data.nationality || "",
                             location: data.location || "",
+                            city: data.city || "",
+                            coordinates: data.coordinates || null,
                             interestsBio: data.interestsBio || "",
                             languagesBio: data.languagesBio || "",
                             countriesBio: data.countriesBio || "",
@@ -93,6 +105,7 @@ const EditProfilePage = () => {
                             picture3: data.picture3 || "",
                             picture4: data.picture4 || ""
                         });
+                        setAddressQuery(data.location || "");
                     }
                 } catch (error) {
                     console.error("Error fetching user data:", error);
@@ -113,6 +126,52 @@ const EditProfilePage = () => {
             ...prev,
             [name]: value
         }));
+    };
+
+    // Live address input with Nominatim API debounce
+    const handleAddressInput = (text) => {
+        setAddressQuery(text);
+        setFormData(prev => ({ ...prev, location: text }));
+
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+
+        if (!text.trim() || text.length < 3) {
+            setAddressResults([]);
+            return;
+        }
+
+        debounceTimerRef.current = setTimeout(async () => {
+            setIsSearchingAddress(true);
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(text)}&limit=5&addressdetails=1`
+                );
+                const items = await response.json();
+                setAddressResults(items || []);
+            } catch (err) {
+                console.error("Geocoding fetch error:", err);
+            } finally {
+                setIsSearchingAddress(false);
+            }
+        }, 400);
+    };
+
+    // Selection from autocomplete suggestions
+    const handleSelectAddressItem = (item) => {
+        const lat = parseFloat(item.lat);
+        const lon = parseFloat(item.lon);
+        const resolvedCity = item.address?.city || item.address?.town || item.address?.village || item.address?.municipality || item.name || "Ulm";
+
+        setAddressQuery(item.display_name);
+        setFormData(prev => ({
+            ...prev,
+            location: item.display_name,
+            city: resolvedCity,
+            coordinates: [lat, lon]
+        }));
+        setAddressResults([]);
     };
 
     const handleAvatarPrompt = () => {
@@ -265,16 +324,44 @@ const EditProfilePage = () => {
                                 fullWidth
                                 sx={textFieldThemeSx}
                             />
-                            <div className="sm:col-span-2">
-                                <TextField
-                                    label="Current Location"
-                                    name="location"
-                                    value={formData.location}
-                                    onChange={handleInputChange}
-                                    placeholder="e.g. Ulm, Germany"
-                                    fullWidth
-                                    sx={textFieldThemeSx}
-                                />
+
+                            {/* Exact Address Input with Autocomplete */}
+                            <div className="sm:col-span-2 relative">
+                                <div className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-gray-50 dark:bg-zinc-800/80 border border-gray-300 dark:border-zinc-700 focus-within:border-[#BA4631] transition-colors">
+                                    <PlaceOutlinedIcon sx={{ color: '#BA4631', fontSize: 20 }} />
+                                    <input
+                                        type="text"
+                                        value={addressQuery}
+                                        onChange={(e) => handleAddressInput(e.target.value)}
+                                        placeholder="Type your exact address (street, house number, city)..."
+                                        className="w-full bg-transparent text-sm text-gray-900 dark:text-zinc-100 placeholder-gray-400 focus:outline-none"
+                                    />
+                                    {isSearchingAddress && (
+                                        <CircularProgress size={16} sx={{ color: '#BA4631' }} />
+                                    )}
+                                </div>
+                                <p className="text-[11px] text-gray-400 dark:text-zinc-500 mt-1 pl-1">
+                                    Used to calculate distance to meetups and sort posts by proximity.
+                                </p>
+
+                                {addressResults.length > 0 && (
+                                    <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-xl z-50 divide-y divide-gray-100 dark:divide-zinc-700 max-h-48 overflow-y-auto text-left">
+                                        {addressResults.map((item, idx) => (
+                                            <div
+                                                key={idx}
+                                                onClick={() => handleSelectAddressItem(item)}
+                                                className="p-2.5 hover:bg-gray-100 dark:hover:bg-zinc-700/60 cursor-pointer text-xs"
+                                            >
+                                                <p className="font-semibold text-[#BA4631] truncate">
+                                                    {item.name || item.address?.road || "Address"}
+                                                </p>
+                                                <p className="text-gray-500 dark:text-zinc-400 truncate text-[11px]">
+                                                    {item.display_name}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

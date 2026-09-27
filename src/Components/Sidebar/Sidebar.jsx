@@ -12,8 +12,30 @@ import Badge from '@mui/material/Badge';
 import { Link } from 'react-router-dom';
 import wemeeter_logo from '../../Pictures/wemeeter_logo_test.png';
 
-import { db } from '../../firebase/firebase';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../../firebase/firebase';
+import { collection, query, onSnapshot, doc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+
+const calculateDistanceKm = (coord1, coord2) => {
+    if (!coord1 || !coord2 || coord1.length < 2 || coord2.length < 2) return null;
+
+    const [lat1, lon1] = coord1;
+    const [lat2, lon2] = coord2;
+
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Number((R * c).toFixed(1));
+};
 
 const Sidebar = ({
                      isCollapsed,
@@ -26,24 +48,76 @@ const Sidebar = ({
                      unreadMessagesCount = 0
                  }) => {
     const [posts, setPosts] = useState([]);
+    const [currentUserCoords, setCurrentUserCoords] = useState(null);
+    const [currentUserFriends, setCurrentUserFriends] = useState([]);
+    const [currentUserId, setCurrentUserId] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
+    // friends and posts
+    useEffect(() => {
+        let unsubUserDoc = () => {};
+
+        const unsubAuth = onAuthStateChanged(auth, (user) => {
+            unsubUserDoc();
+            if (user) {
+                setCurrentUserId(user.uid);
+                unsubUserDoc = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        setCurrentUserCoords(data.coordinates || null);
+                        setCurrentUserFriends(data.friends || []);
+                    }
+                });
+            } else {
+                setCurrentUserId(null);
+                setCurrentUserCoords(null);
+                setCurrentUserFriends([]);
+            }
+        });
+
+        return () => {
+            unsubAuth();
+            unsubUserDoc();
+        };
+    }, []);
+
+    // privacy
     useEffect(() => {
         const postsRef = collection(db, "posts");
-        const q = query(postsRef, orderBy("createdAt", "desc"));
+        const q = query(postsRef);
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            const fetched = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
+            const now = Date.now();
+            const fetched = snapshot.docs.map((docSnap) => ({
+                id: docSnap.id,
+                ...docSnap.data()
             }));
-            setPosts(fetched);
+
+            // check rules and time
+            const accessiblePosts = fetched.filter((post) => {
+                // remove old
+                if (post.expiresAtMs && post.expiresAtMs <= now) {
+                    return false;
+                }
+
+                const postVis = post.visibility || 'all';
+                const isOwner = currentUserId && post.userId === currentUserId;
+
+                if (postVis === 'all') return true;
+                if (postVis === 'private') return isOwner;
+                if (postVis === 'friends') {
+                    return isOwner || currentUserFriends.includes(post.userId);
+                }
+                return true;
+            });
+
+            setPosts(accessiblePosts);
         }, (error) => {
             console.error("Error fetching live posts in sidebar:", error);
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [currentUserId, currentUserFriends]);
 
     const handleNotificationClick = () => {
         if (isNotifOpen) {
@@ -53,12 +127,35 @@ const Sidebar = ({
         }
     };
 
-    const filteredPosts = posts.filter((post) => {
+    const processedPosts = posts.map(post => {
+        const dist = currentUserCoords && post.coordinates
+            ? calculateDistanceKm(currentUserCoords, post.coordinates)
+            : null;
+        return {
+            ...post,
+            distanceKm: dist
+        };
+    });
+
+    processedPosts.sort((a, b) => {
+        if (a.distanceKm !== null && b.distanceKm !== null) {
+            return a.distanceKm - b.distanceKm;
+        }
+        if (a.distanceKm !== null) return -1;
+        if (b.distanceKm !== null) return 1;
+
+        const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt || 0);
+        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt || 0);
+        return timeB - timeA;
+    });
+
+    const filteredPosts = processedPosts.filter((post) => {
         const queryLower = searchQuery.toLowerCase();
         const titleMatch = post.title?.toLowerCase().includes(queryLower);
         const descMatch = post.desc?.toLowerCase().includes(queryLower);
         const authorMatch = post.name?.toLowerCase().includes(queryLower) || post.username?.toLowerCase().includes(queryLower);
-        return titleMatch || descMatch || authorMatch;
+        const cityMatch = post.city?.toLowerCase().includes(queryLower) || post.location?.toLowerCase().includes(queryLower);
+        return titleMatch || descMatch || authorMatch || cityMatch;
     });
 
     return (
@@ -78,7 +175,7 @@ const Sidebar = ({
                 </Link>
             </div>
 
-            {/* menu */}
+            {/* Menu */}
             <div className={`flex items-center px-2 pb-4 transition-all duration-300 ${isCollapsed ? 'flex-col gap-6 mt-12' : 'flex-row justify-between px-7'}`}>
                 <IconButton
                     onClick={toggleSidebar}
@@ -93,7 +190,6 @@ const Sidebar = ({
                     </IconButton>
                 </Link>
 
-                {/* messages */}
                 <Link to="/messages">
                     <IconButton sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}>
                         <Badge
@@ -114,7 +210,6 @@ const Sidebar = ({
                     </IconButton>
                 </Link>
 
-                {/* notif */}
                 <IconButton
                     onClick={handleNotificationClick}
                     sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}
@@ -160,7 +255,7 @@ const Sidebar = ({
                 </div>
             </div>
 
-            {/* Realtime Posts List */}
+            {/* Sorted Posts List */}
             <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1 custom-scrollbar">
                 {filteredPosts.length > 0 ? (
                     filteredPosts.map((post) => (
