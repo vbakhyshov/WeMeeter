@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "wemeetapp-c03af",
     "public": "build",
     "ignore": [
       "firebase.json",
